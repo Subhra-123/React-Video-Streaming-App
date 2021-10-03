@@ -1,5 +1,6 @@
 // import { formValues } from 'redux-form';
 import streams from '../api/streams';
+import history from '../history';
 export const signIn=(userId)=>{
     return {
         type:'SIGN_IN',
@@ -14,9 +15,11 @@ export const signOut=()=>{
 }
 
 export const createStream=(formValues)=>{
-    return async (dispatch)=>{
-        const response= await streams.post('/streams',formValues);
-        dispatch({type:'CREATE_STREAM',payload:response.data})
+    return async (dispatch,getState)=>{
+        const {userId}=getState().auth;
+        const response= await streams.post('/streams',{...formValues,userId});
+        dispatch({type:'CREATE_STREAM',payload:response.data});
+        history.push('/');
     }
 }
 
@@ -36,8 +39,9 @@ export const fetchStream=(id)=>{
 
 export const editStream=(id,formValues)=>{
     return async (dispatch)=>{
-        const response= await streams.put(`/streams/${id}`,formValues);
-        dispatch({type:'EDIT_STREAM',payload:response.data})
+        const response= await streams.patch(`/streams/${id}`,formValues);
+        dispatch({type:'EDIT_STREAM',payload:response.data});
+        history.push('/');
     }
 }
 
